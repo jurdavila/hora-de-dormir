@@ -1,20 +1,21 @@
 // ===== Estrelinhas: missões, prêmios, versículo e fruto da semana + sincronização =====
 (function () {
   const NAMES = ["Manu", "Elena"];
+  const AGES = { Manu: 9, Elena: 7 };
 
   // Missões pensadas para meninas de 7 e 9 anos
   const DEFAULT_TASKS = [
     { id: "cama", e: "🛏️", t: "Arrumar a cama", p: "arrumou a sua cama", g: "manha", on: true },
     { id: "dentes1", e: "🪥", t: "Escovar os dentes (manhã)", p: "escovou os dentes direitinho", g: "manha", on: false },
     { id: "oracao1", e: "🙏", t: "Oração da manhã", p: "começou o dia falando com Deus", g: "manha", on: true },
-    { id: "devocional", e: "📖", t: "Ler a Bíblia sozinha (devocional)", p: "leu a Bíblia sozinha", g: "manha", on: false },
+    { id: "devocional", e: "📖", t: "Ler a Bíblia sozinha (devocional)", p: "leu a Bíblia sozinha", g: "manha", on: true, who: "Manu" },
     { id: "mochila", e: "🎒", t: "Arrumar a mochila e o uniforme", p: "arrumou a mochila sozinha", g: "manha", on: false },
     { id: "licao", e: "✏️", t: "Fazer a lição de casa sem reclamar", p: "fez a lição de casa", g: "escola", on: true },
     { id: "leitura", e: "📚", t: "Ler 15 minutos", p: "leu um livro por 15 minutos", g: "escola", on: true },
     { id: "mesa", e: "🍽️", t: "Pôr ou tirar a mesa", p: "ajudou com a mesa", g: "dia", on: true },
-    { id: "quarto", e: "🧸", t: "Arrumar o quarto e os brinquedos", p: "deixou o quarto arrumado", g: "dia", on: false },
+    { id: "quarto", e: "🧸", t: "Arrumar o quarto e os brinquedos", p: "deixou o quarto arrumado", g: "dia", on: true, who: "Elena" },
     { id: "roupas", e: "👕", t: "Guardar as próprias roupas", p: "guardou as suas roupas", g: "dia", on: false },
-    { id: "cozinha", e: "🥣", t: "Ajudar no jantar ou na louça", p: "ajudou na cozinha", g: "dia", on: false },
+    { id: "cozinha", e: "🥣", t: "Ajudar no jantar ou na louça", p: "ajudou na cozinha", g: "dia", on: false, who: "Manu" },
     { id: "banho", e: "🛁", t: "Banho sem reclamar", p: "tomou banho sem reclamar", g: "noite", on: false },
     { id: "biblia", e: "🌙", t: "Rotina da Bíblia e oração", p: "ouviu a história e orou", g: "noite", on: true },
     { id: "deitar", e: "😴", t: "Deitar na hora sem enrolar", p: "foi deitar na hora certinha", g: "noite", on: false },
@@ -44,20 +45,20 @@
 
   // Versículos em linguagem simples para crianças (confira na sua Bíblia preferida)
   const VERSES = [
-    { r: "Efésios 6:1", t: "Filhos, obedeçam a seus pais no Senhor, pois isso é certo." },
-    { r: "Salmo 56:3", t: "Quando eu tiver medo, vou confiar em Ti, Senhor." },
-    { r: "Filipenses 4:13", t: "Tudo posso naquele que me fortalece." },
+    { r: "Efésios 6:1", t: "Filhos, obedeçam a seus pais no Senhor, pois isso é certo.", mr: "Efésios 6:1-3", m: "Filhos, obedeçam a seus pais no Senhor, pois isso é certo. Honre seu pai e sua mãe, para que tudo lhe vá bem." },
+    { r: "Salmo 56:3", t: "Quando eu tiver medo, vou confiar em Ti, Senhor.", mr: "Salmo 56:3-4", m: "Quando eu tiver medo, vou confiar em Ti. Em Deus eu confio e não terei medo." },
+    { r: "Filipenses 4:13", t: "Tudo posso naquele que me fortalece.", mr: "Filipenses 4:6,13", m: "Não fiquem ansiosos por nada, mas em tudo orem a Deus. Tudo posso naquele que me fortalece." },
     { r: "Efésios 4:32", t: "Sejam bondosos uns com os outros e perdoem-se, como Deus perdoou vocês." },
-    { r: "Salmo 118:24", t: "Este é o dia que o Senhor fez: vamos nos alegrar nele!" },
-    { r: "1 João 4:19", t: "Nós amamos porque Deus nos amou primeiro." },
+    { r: "Salmo 118:24", t: "Este é o dia que o Senhor fez: vamos nos alegrar nele!", mr: "Salmo 118:24,29", m: "Este é o dia que o Senhor fez: vamos nos alegrar nele! Deem graças ao Senhor, porque Ele é bom; o seu amor dura para sempre." },
+    { r: "1 João 4:19", t: "Nós amamos porque Deus nos amou primeiro.", mr: "1 João 4:7,19", m: "Amados, amemos uns aos outros, pois o amor vem de Deus. Nós amamos porque Ele nos amou primeiro." },
     { r: "Josué 1:9", t: "Seja forte e corajoso! O Senhor, seu Deus, está com você aonde você for." },
-    { r: "Salmo 119:105", t: "A Tua Palavra é lâmpada para os meus pés e luz para o meu caminho." },
-    { r: "1 Tessalonicenses 5:18", t: "Em tudo deem graças a Deus." },
-    { r: "Provérbios 3:5", t: "Confie no Senhor de todo o seu coração." },
+    { r: "Salmo 119:105", t: "A Tua Palavra é lâmpada para os meus pés e luz para o meu caminho.", mr: "Salmo 119:11,105", m: "Guardei a Tua Palavra no meu coração para não pecar contra Ti. A Tua Palavra é lâmpada para os meus pés e luz para o meu caminho." },
+    { r: "1 Tessalonicenses 5:18", t: "Em tudo deem graças a Deus.", mr: "1 Tessalonicenses 5:16-18", m: "Estejam sempre alegres, orem sem parar e em tudo deem graças a Deus." },
+    { r: "Provérbios 3:5", t: "Confie no Senhor de todo o seu coração.", mr: "Provérbios 3:5-6", m: "Confie no Senhor de todo o seu coração e não se apoie no seu próprio entendimento. Lembre-se de Deus em tudo o que fizer, e Ele vai mostrar o caminho certo." },
     { r: "Colossenses 3:20", t: "Filhos, obedeçam a seus pais em tudo, pois isso agrada ao Senhor." },
     { r: "João 3:16", t: "Deus amou tanto o mundo que deu o seu Filho Jesus, para que todo aquele que nele crê tenha a vida eterna." },
     { r: "Salmo 4:8", t: "Em paz me deito e logo durmo, porque só Tu, Senhor, me fazes viver em segurança." },
-    { r: "Mateus 19:14", t: "Jesus disse: Deixem as crianças virem a mim." }
+    { r: "Mateus 19:14", t: "Jesus disse: Deixem as crianças virem a mim.", m: "Jesus disse: Deixem as crianças virem a mim e não as impeçam, pois o Reino dos céus pertence aos que são como elas." }
   ];
 
   // Fruto do Espírito (Gálatas 5:22-23): um por semana
@@ -76,7 +77,7 @@
   const WEEK0 = "2026-11-09"; // segunda-feira
   const today = () => tonight();
   const weekIdx = () => Math.floor((dayNum(today()) - dayNum(WEEK0)) / 7);
-  const verse = () => VERSES[((weekIdx() % VERSES.length) + VERSES.length) % VERSES.length];
+  const verse = who => { const v = VERSES[((weekIdx() % VERSES.length) + VERSES.length) % VERSES.length]; return who === "Manu" && v.m ? { r: v.mr || v.r, t: v.m } : v; };
   const fruit = () => FRUITS[((weekIdx() % FRUITS.length) + FRUITS.length) % FRUITS.length];
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
@@ -84,11 +85,11 @@
   function K() {
     if (!S.k) S.k = {};
     const k = S.k;
-    if (k.v !== 2) {
+    if (k.v !== 3) {
       const myTasks = (k.tasks || []).filter(t => t.custom), myPrizes = (k.prizes || []).filter(p => !/^p\d+$/.test(p.id));
       k.tasks = DEFAULT_TASKS.map(t => Object.assign({}, t)).concat(myTasks);
       k.prizes = DEFAULT_PRIZES.map(p => Object.assign({}, p)).concat(myPrizes);
-      k.v = 2;
+      k.v = 3;
     }
     k.log = k.log || {}; k.bonus = k.bonus || []; k.spent = k.spent || []; k.goal = k.goal || {};
     return k;
@@ -216,10 +217,10 @@
     const k = K(), who = sel, cls = who.toLowerCase(), b = balance(who), d = today();
     const goal = k.prizes.find(p => p.id === k.goal[who]);
     const pct = goal ? Math.min(100, Math.round(b / goal.c * 100)) : 0;
-    const v = verse(), f = fruit();
-    const active = k.tasks.filter(t => t.on);
+    const v = verse(who), f = fruit();
+    const active = k.tasks.filter(t => t.on && (!t.who || t.who === who));
     let h = `<div class="top"><h1 style="font-size:24px">Estrelinhas ⭐</h1><small>${cap(parse(d).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" }))}</small></div>`;
-    h += `<div class="ex-kids">${NAMES.map(n => `<button class="${n.toLowerCase()} ${n === who ? "on" : ""}" onclick="EX.sel('${n}')">${n}</button>`).join("")}</div>`;
+    h += `<div class="ex-kids">${NAMES.map(n => `<button class="${n.toLowerCase()} ${n === who ? "on" : ""}" onclick="EX.sel('${n}')">${n} <small style="font-size:13px;opacity:.8">${AGES[n]} anos</small></button>`).join("")}</div>`;
     h += `<div class="ex-bal ${cls}"><small>${who} tem</small><div class="n">${b} ⭐</div><small>${todayCount(who)} hoje</small>`;
     h += goal ? `<div class="ex-bar"><i style="width:${pct}%"></i></div><small>🎯 ${esc(goal.t)}: ${b >= goal.c ? "já pode trocar! 🎉" : "faltam " + (goal.c - b)}</small>` : `<small style="margin-top:8px;opacity:.85">Toque em 🎯 num prêmio para escolher a meta</small>`;
     h += `</div>`;
@@ -250,15 +251,15 @@
     if (why === null) return;
     addBonus(1, why.trim() || "Estrelinha bônus");
   }
-  function sayVerse() { const v = verse(); speakText(`${v.r}. ${v.t}`, null); }
+  function sayVerse() { const v = verse(sel); speakText(`${v.r}. ${v.t}`, null); }
 
   // ---------- ajustes ----------
   const aj = document.createElement("div");
   document.getElementById("v-aj").insertBefore(aj, document.getElementById("v-aj").children[1]);
   function renderAjustes() {
     const k = K();
-    let h = `<div class="card"><h3 style="font-size:20px">⭐ Missões</h3><p class="hint" style="text-align:left">Comece com poucas (5 a 8). Quando virar hábito, troque por outras.</p>`;
-    h += k.tasks.map(t => `<div class="ex-edit"><label><input type="checkbox" ${t.on ? "checked" : ""} onchange="EX.tOn('${t.id}',this.checked)"> ${t.e} ${esc(t.t)}</label>${t.custom ? `<button class="ex-x" onclick="EX.tDel('${t.id}')">✕</button>` : ""}</div>`).join("");
+    let h = `<div class="card"><h3 style="font-size:20px">⭐ Missões</h3><p class="hint" style="text-align:left">Comece com poucas (5 a 8). Quando virar hábito, troque por outras. Escolha se cada missão é da Manu, da Elena ou das duas.</p>`;
+    h += k.tasks.map(t => `<div class="ex-edit"><label><input type="checkbox" ${t.on ? "checked" : ""} onchange="EX.tOn('${t.id}',this.checked)"> ${t.e} ${esc(t.t)}</label><select style="width:96px;padding:6px" onchange="EX.tWho('${t.id}',this.value)">${["", "Manu", "Elena"].map(o => `<option value="${o}" ${(t.who || "") === o ? "selected" : ""}>${o || "Ambas"}</option>`).join("")}</select>${t.custom ? `<button class="ex-x" onclick="EX.tDel('${t.id}')">✕</button>` : ""}</div>`).join("");
     h += `<div class="ex-edit" style="margin-top:10px"><input class="em" id="ex-nt-e" value="⭐"><input id="ex-nt-t" placeholder="Nova missão"><select id="ex-nt-g" style="width:110px">${Object.keys(GROUPS).map(g => `<option value="${g}">${GROUPS[g]}</option>`).join("")}</select></div><button class="btn full" onclick="EX.tAdd()">+ Adicionar missão</button></div>`;
     h += `<div class="card"><h3 style="font-size:20px">🎁 Prêmios</h3><p class="hint" style="text-align:left">Ajuste os valores e escolha prêmios junto com as meninas.</p>`;
     h += k.prizes.map(p => `<div class="ex-edit"><input class="em" value="${esc(p.e)}" onchange="EX.pSet('${p.id}','e',this.value)"><input value="${esc(p.t)}" onchange="EX.pSet('${p.id}','t',this.value)"><input class="num" type="number" min="1" value="${p.c}" onchange="EX.pSet('${p.id}','c',this.value)"><button class="ex-x" onclick="EX.pDel('${p.id}')">✕</button></div>`).join("");
@@ -350,6 +351,7 @@
   window.EX = {
     sel: setSel, task: toggleTask, bonus: bonusPrompt, verse: verseDone, say: sayVerse, redeem, goal: setGoal,
     tOn(id, on) { const t = K().tasks.find(x => x.id === id); if (t) { t.on = on; save(); render(); } },
+    tWho(id, w) { const t = K().tasks.find(x => x.id === id); if (t) { t.who = w || null; save(); render(); } },
     tDel(id) { K().tasks = K().tasks.filter(x => x.id !== id); save(); renderAjustes(); render(); },
     tAdd() { const t = $("ex-nt-t").value.trim(); if (!t) return toast("Escreva a missão"); K().tasks.push({ id: "c" + uid(), e: $("ex-nt-e").value.trim() || "⭐", t, p: "cumpriu a missão: " + t.toLowerCase(), g: $("ex-nt-g").value, on: true, custom: true }); save(); renderAjustes(); render(); toast("Missão adicionada"); },
     pSet(id, f, v) { const p = K().prizes.find(x => x.id === id); if (!p) return; p[f] = f === "c" ? Math.max(1, parseInt(v) || 1) : v; save(); render(); },
