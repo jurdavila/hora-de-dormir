@@ -2,38 +2,44 @@
 (function () {
   const NAMES = ["Manu", "Elena"];
 
+  // Missões pensadas para meninas de 7 e 9 anos
   const DEFAULT_TASKS = [
     { id: "cama", e: "🛏️", t: "Arrumar a cama", p: "arrumou a sua cama", g: "manha", on: true },
-    { id: "dentes1", e: "🪥", t: "Escovar os dentes (manhã)", p: "escovou os dentes direitinho", g: "manha", on: true },
-    { id: "roupa", e: "👗", t: "Trocar de roupa sozinha", p: "se trocou sozinha", g: "manha", on: false },
+    { id: "dentes1", e: "🪥", t: "Escovar os dentes (manhã)", p: "escovou os dentes direitinho", g: "manha", on: false },
     { id: "oracao1", e: "🙏", t: "Oração da manhã", p: "começou o dia falando com Deus", g: "manha", on: true },
-    { id: "brinquedos", e: "🧸", t: "Guardar os brinquedos", p: "guardou os brinquedos", g: "dia", on: true },
-    { id: "mesa", e: "🍽️", t: "Ajudar a pôr a mesa", p: "ajudou a pôr a mesa", g: "dia", on: false },
-    { id: "cesto", e: "🧺", t: "Roupa suja no cesto", p: "colocou a roupa no cesto", g: "dia", on: false },
-    { id: "comida", e: "🥦", t: "Comer sem reclamar", p: "comeu tudo sem reclamar", g: "dia", on: false },
-    { id: "banho", e: "🛁", t: "Banho sem reclamar", p: "tomou banho sem reclamar", g: "noite", on: true },
-    { id: "dentes2", e: "🪥", t: "Escovar os dentes (noite)", p: "escovou os dentes antes de dormir", g: "noite", on: false },
-    { id: "biblia", e: "📖", t: "Rotina da Bíblia e oração", p: "ouviu a história e orou", g: "noite", on: true },
-    { id: "deitar", e: "😴", t: "Deitar na hora", p: "foi deitar na hora certinha", g: "noite", on: false },
+    { id: "devocional", e: "📖", t: "Ler a Bíblia sozinha (devocional)", p: "leu a Bíblia sozinha", g: "manha", on: false },
+    { id: "mochila", e: "🎒", t: "Arrumar a mochila e o uniforme", p: "arrumou a mochila sozinha", g: "manha", on: false },
+    { id: "licao", e: "✏️", t: "Fazer a lição de casa sem reclamar", p: "fez a lição de casa", g: "escola", on: true },
+    { id: "leitura", e: "📚", t: "Ler 15 minutos", p: "leu um livro por 15 minutos", g: "escola", on: true },
+    { id: "mesa", e: "🍽️", t: "Pôr ou tirar a mesa", p: "ajudou com a mesa", g: "dia", on: true },
+    { id: "quarto", e: "🧸", t: "Arrumar o quarto e os brinquedos", p: "deixou o quarto arrumado", g: "dia", on: false },
+    { id: "roupas", e: "👕", t: "Guardar as próprias roupas", p: "guardou as suas roupas", g: "dia", on: false },
+    { id: "cozinha", e: "🥣", t: "Ajudar no jantar ou na louça", p: "ajudou na cozinha", g: "dia", on: false },
+    { id: "banho", e: "🛁", t: "Banho sem reclamar", p: "tomou banho sem reclamar", g: "noite", on: false },
+    { id: "biblia", e: "🌙", t: "Rotina da Bíblia e oração", p: "ouviu a história e orou", g: "noite", on: true },
+    { id: "deitar", e: "😴", t: "Deitar na hora sem enrolar", p: "foi deitar na hora certinha", g: "noite", on: false },
     { id: "obedecer", e: "👂", t: "Obedecer na primeira vez", p: "obedeceu na primeira vez", g: "coracao", on: true },
     { id: "irma", e: "💕", t: "Ser gentil com a irmã", p: "foi gentil com a sua irmã", g: "coracao", on: true },
+    { id: "verdade", e: "✅", t: "Falar sempre a verdade", p: "falou a verdade", g: "coracao", on: false },
     { id: "perdao", e: "🤝", t: "Pedir desculpas / perdoar", p: "pediu desculpas e perdoou", g: "coracao", on: false },
-    { id: "obrigado", e: "🙌", t: "Dizer “por favor” e “obrigada”", p: "foi educada e agradecida", g: "coracao", on: false }
+    { id: "orar", e: "🙌", t: "Orar por alguém", p: "orou por outra pessoa", g: "coracao", on: false }
   ];
-  const GROUPS = { manha: "☀️ Manhã", dia: "🌤️ Durante o dia", noite: "🌙 Noite", coracao: "💖 Coração" };
+  const GROUPS = { manha: "☀️ Manhã", escola: "📚 Escola", dia: "🌤️ Em casa", noite: "🌙 Noite", coracao: "💖 Coração" };
 
   const DEFAULT_PRIZES = [
     { id: "p1", e: "🍮", t: "Escolher a sobremesa do dia", c: 5 },
-    { id: "p2", e: "📚", t: "Uma história extra antes de dormir", c: 8 },
-    { id: "p3", e: "🎶", t: "Escolher o louvor da família no carro", c: 10 },
-    { id: "p4", e: "⏰", t: "15 minutos a mais acordada (fim de semana)", c: 15 },
+    { id: "p2", e: "🎶", t: "Escolher o louvor da família no carro", c: 8 },
+    { id: "p3", e: "⏰", t: "30 minutos a mais acordada (fim de semana)", c: 12 },
+    { id: "p4", e: "📱", t: "30 minutos extras de tablet ou TV", c: 15 },
     { id: "p5", e: "🍿", t: "Noite do filme em família com pipoca", c: 20 },
-    { id: "p6", e: "🥞", t: "Escolher o café da manhã especial", c: 25 },
+    { id: "p6", e: "👩‍🍳", t: "Cozinhar uma receita com o papai ou a mamãe", c: 25 },
     { id: "p7", e: "👨‍👧", t: "Tarde especial só com o papai ou a mamãe", c: 30 },
-    { id: "p8", e: "🍦", t: "Passeio no parque com sorvete", c: 40 },
-    { id: "p9", e: "🎁", t: "Livro ou brinquedo pequeno", c: 50 },
+    { id: "p8", e: "👭", t: "Convidar uma amiga para brincar em casa", c: 40 },
+    { id: "p9", e: "🗺️", t: "Escolher o passeio do sábado", c: 50 },
     { id: "p10", e: "⛪", t: "Ser ajudante especial do papai/mamãe na igreja", c: 60 },
-    { id: "p11", e: "🦁", t: "Passeio especial (zoológico, cinema...)", c: 100 }
+    { id: "p11", e: "🎁", t: "Livro ou brinquedo que ela escolher", c: 80 },
+    { id: "p12", e: "🛌", t: "Noite do pijama com uma amiga", c: 120 },
+    { id: "p13", e: "🎢", t: "Passeio especial (zoológico, cinema, parque)", c: 150 }
   ];
 
   // Versículos em linguagem simples para crianças (confira na sua Bíblia preferida)
@@ -78,8 +84,12 @@
   function K() {
     if (!S.k) S.k = {};
     const k = S.k;
-    if (!k.tasks) k.tasks = DEFAULT_TASKS.map(t => Object.assign({}, t));
-    if (!k.prizes) k.prizes = DEFAULT_PRIZES.map(p => Object.assign({}, p));
+    if (k.v !== 2) {
+      const myTasks = (k.tasks || []).filter(t => t.custom), myPrizes = (k.prizes || []).filter(p => !/^p\d+$/.test(p.id));
+      k.tasks = DEFAULT_TASKS.map(t => Object.assign({}, t)).concat(myTasks);
+      k.prizes = DEFAULT_PRIZES.map(p => Object.assign({}, p)).concat(myPrizes);
+      k.v = 2;
+    }
     k.log = k.log || {}; k.bonus = k.bonus || []; k.spent = k.spent || []; k.goal = k.goal || {};
     return k;
   }
