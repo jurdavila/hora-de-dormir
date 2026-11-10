@@ -1,4 +1,4 @@
-const CACHE = "hora-de-dormir-v2";
+const CACHE = "hora-de-dormir-v3";
 const ASSETS = ["./", "index.html", "app.js", "extra.js", "stories.js", "manifest.json", "icons/icon-192.png", "icons/icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))); self.skipWaiting(); });
 self.addEventListener("activate", e => {

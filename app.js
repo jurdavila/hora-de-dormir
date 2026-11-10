@@ -26,24 +26,76 @@ function whoOn(dateStr) {
 }
 
 // ---------- histórias ----------
-const STORY_START = "2026-11-10";
-function todayStoryIdx() {
-  const n = STORIES.length;
-  return (((dayNum(tonight()) - dayNum(STORY_START)) % n) + n) % n;
+// Uma história para cada dia do ano (29/02 repete a de 28/02)
+const MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+const DIAS_MES = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+function idxOf(m, d) { let i = 0; for (let k = 0; k < m - 1; k++) i += DIAS_MES[k]; return i + Math.min(d, DIAS_MES[m - 1]) - 1; }
+function dateOfIdx(i) { let m = 0; while (i >= DIAS_MES[m]) { i -= DIAS_MES[m]; m++; } return { m: m + 1, d: i + 1 }; }
+function todayStoryIdx() { const [, m, d] = tonight().split("-").map(Number); return idxOf(m, d) % STORIES.length; }
+const emo = s => s.e || (s.em || "📖").split("|")[0];
+
+// ---------- ilustração de cada história (desenho em SVG) ----------
+const CENAS = {
+  luz: ["#fff3c4", "#ffb86b", "#ffd98a", "raios"], ceu: ["#8fd3ff", "#e3f6ff", "#9be07a", "sol"],
+  noite: ["#141036", "#3b2f86", "#2a2160", "lua"], mar: ["#8fd3ff", "#e3f6ff", "#2f7fd1", "mar"],
+  deserto: ["#ffd9a0", "#fff1d6", "#f0b765", "sol"], acampamento: ["#ffd9a0", "#fff1d6", "#f0b765", "sol"],
+  jardim: ["#a8e6ff", "#effaff", "#6ccf6a", "flores"], campo: ["#9edcff", "#eefaff", "#7ccf5a", "sol"],
+  cidade: ["#ffcfa8", "#fff0e0", "#d9b48a", "predios"], chuva: ["#7d8aa3", "#b9c3d6", "#5b8f6a", "chuva"],
+  montanha: ["#9fd0ff", "#eaf5ff", "#7aa36a", "montes"], casa: ["#f6dfbf", "#fff4e4", "#c8935f", "janela"],
+  rio: ["#9fd8ff", "#eefaff", "#6cc46a", "rio"], palacio: ["#7b5cc9", "#c9b6ff", "#5a3e9e", "colunas"],
+  prisao: ["#3a3a4a", "#5d5d70", "#2d2d38", "grades"], templo: ["#ffdca8", "#fff3dd", "#d8b07a", "colunas"]
+};
+function ilustracao(s, id) {
+  const c = CENAS[s.sc] || CENAS.ceu, em = (s.em || emo(s)).split("|");
+  let deco = "";
+  if (c[3] === "sol") deco = `<circle cx="270" cy="38" r="20" fill="#ffd34d"/>`;
+  if (c[3] === "lua") { deco = `<circle cx="265" cy="36" r="16" fill="#ffe08a"/><circle cx="272" cy="31" r="14" fill="${c[0]}"/>`; for (let i = 0; i < 18; i++) deco += `<circle cx="${(i * 53) % 320}" cy="${(i * 37) % 90 + 6}" r="${i % 3 ? 1.2 : 2}" fill="#fff" opacity=".8"/>`; }
+  if (c[3] === "raios") for (let i = 0; i < 12; i++) deco += `<rect x="158" y="-40" width="6" height="140" fill="#fff" opacity=".35" transform="rotate(${i * 30} 160 70)"/>`;
+  if (c[3] === "chuva") for (let i = 0; i < 26; i++) deco += `<line x1="${(i * 29) % 320}" y1="${(i * 17) % 80}" x2="${(i * 29) % 320 - 6}" y2="${(i * 17) % 80 + 14}" stroke="#dfe8ff" stroke-width="2" opacity=".7"/>`;
+  if (c[3] === "predios") deco = [20, 70, 230, 280].map((x, i) => `<rect x="${x}" y="${70 - i % 2 * 18}" width="38" height="80" rx="4" fill="#e9c79e"/>`).join("");
+  if (c[3] === "montes") deco = `<path d="M0 140 L70 60 L140 140 Z" fill="#8bb58a"/><path d="M110 140 L210 40 L310 140 Z" fill="#9cc79a"/><path d="M190 58 L210 40 L230 58 Z" fill="#fff"/>`;
+  if (c[3] === "janela") deco = `<rect x="226" y="24" width="70" height="56" rx="6" fill="#bfe6ff" stroke="#fff" stroke-width="5"/><line x1="261" y1="24" x2="261" y2="80" stroke="#fff" stroke-width="4"/>`;
+  if (c[3] === "colunas") deco = [30, 80, 230, 280].map(x => `<rect x="${x - 8}" y="20" width="16" height="125" rx="3" fill="#fff" opacity=".45"/>`).join("");
+  if (c[3] === "grades") deco = Array.from({ length: 9 }, (_, i) => `<rect x="${i * 38 + 8}" y="0" width="6" height="180" fill="#20202a" opacity=".55"/>`).join("");
+  let chao = `<path d="M0 135 Q80 118 160 132 T320 128 V180 H0 Z" fill="${c[2]}"/>`;
+  if (c[3] === "mar") chao = `<path d="M0 120 Q40 110 80 120 T160 120 T240 120 T320 120 V180 H0 Z" fill="#3a8fe0"/><path d="M0 140 Q40 130 80 140 T160 140 T240 140 T320 140 V180 H0 Z" fill="${c[2]}"/>`;
+  if (c[3] === "rio") chao += `<path d="M120 180 Q150 150 140 132 L180 132 Q200 150 210 180 Z" fill="#4aa8f0"/>`;
+  if (c[3] === "flores") { deco = `<circle cx="270" cy="38" r="20" fill="#ffd34d"/>`; chao += [30, 70, 250, 290].map((x, i) => `<circle cx="${x}" cy="${150 + i % 2 * 10}" r="5" fill="${["#ff6fae", "#ffd34d", "#fff", "#b388ff"][i]}"/>`).join(""); }
+  const t = (e, x, y, sz, cls) => e ? `<text x="${x}" y="${y}" font-size="${sz}" text-anchor="middle" class="${cls}">${e}</text>` : "";
+  return `<svg viewBox="0 0 320 180" role="img" aria-label="Ilustração: ${esc(s.t)}" class="ill-svg"><defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset="1" stop-color="${c[1]}"/></linearGradient></defs><rect width="320" height="180" fill="url(#g${id})"/>${deco}${chao}${t(em[1], 62, 150, 46, "b2")}${t(em[2], 258, 150, 46, "b3")}${t(em[0], 160, 128, 86, "b1")}</svg>`;
 }
+(function () {
+  const st = document.createElement("style");
+  st.textContent = `.ill{border-radius:20px;overflow:hidden;margin:4px 0 14px;box-shadow:0 6px 18px #0004;line-height:0}
+  .ill-svg{width:100%;height:auto;display:block}.ill-svg text{dominant-baseline:auto}
+  .ill-svg .b1{animation:bob 3s ease-in-out infinite}.ill-svg .b2{animation:bob 3.6s ease-in-out infinite .4s}.ill-svg .b3{animation:bob 3.3s ease-in-out infinite .8s}
+  @keyframes bob{50%{transform:translateY(-4px)}}
+  .mes{background:#ffffff0d;border-radius:14px;margin-bottom:8px;padding:4px 10px}.mes summary{font-family:"Baloo 2";font-size:18px;padding:8px 2px;cursor:pointer;color:var(--gold)}
+  .li .dt{font-size:12px;color:var(--gold);font-weight:700;min-width:38px}
+  .hs-ill{margin:0 0 12px}`;
+  document.head.appendChild(st);
+})();
 let curStory = 0;
 function openStory(i) { curStory = i; renderStory(); show("historia"); window.scrollTo(0, 0); }
 function stepStory(d) { stopSpeak(); curStory = (curStory + d + STORIES.length) % STORIES.length; renderStory(); window.scrollTo(0, 0); }
 function renderStory() {
   const s = STORIES[curStory];
-  $("s-em").textContent = s.e; $("s-t").textContent = s.t; $("s-ref").textContent = s.ref;
+  $("s-em").textContent = emo(s); $("s-t").textContent = s.t; $("s-ref").textContent = s.ref;
+  let il = $("s-ill"); if (!il) { il = document.createElement("div"); il.id = "s-ill"; il.className = "ill"; $("s-txt").parentNode.insertBefore(il, $("s-txt")); }
+  il.innerHTML = ilustracao(s, "s");
   $("s-txt").innerHTML = s.txt.split("\n").map(p => `<p>${esc(p)}</p>`).join("");
   $("s-lic").textContent = s.lic; $("s-q").textContent = s.q; $("s-ora").textContent = s.ora;
-  $("st-pos").textContent = `${curStory + 1} de ${STORIES.length}` + (curStory === todayStoryIdx() ? " · de hoje" : "");
+  const dt = dateOfIdx(curStory);
+  $("st-pos").textContent = `${dt.d} de ${MESES[dt.m - 1]}` + (curStory === todayStoryIdx() ? " · hoje" : "");
 }
 function renderList() {
-  $("s-list").innerHTML = STORIES.map((s, i) =>
-    `<button class="li" onclick="openStory(${i})"><span class="em">${s.e}</span><span><b>${esc(s.t)}</b><small>${esc(s.ref)}</small></span></button>`).join("");
+  const hoje = dateOfIdx(todayStoryIdx()).m; let h = "", i = 0;
+  MESES.forEach((nome, m) => {
+    let itens = "";
+    for (let d = 1; d <= DIAS_MES[m]; d++, i++) { const s = STORIES[i]; if (!s) break; itens += `<button class="li" onclick="openStory(${i})"><span class="dt">${d}/${m + 1}</span><span class="em">${emo(s)}</span><span><b>${esc(s.t)}</b><small>${esc(s.ref)}</small></span></button>`; }
+    h += `<details class="mes" ${m + 1 === hoje ? "open" : ""}><summary>${cap(nome)}</summary><div class="list">${itens}</div></details>`;
+  });
+  $("s-list").innerHTML = h;
 }
 function openVideo() {
   const q = "história bíblica infantil " + STORIES[curStory].t;
@@ -122,7 +174,9 @@ function renderHoje() {
     `<button class="step ${d[s.k] ? "done" : ""}" onclick="stepClick('${s.k}')"><span class="ic">${s.ic}</span><span class="tx"><b>${s.t}</b><span>${s.d}</span></span><span class="ck">${d[s.k] ? "✓" : ""}</span></button>`).join("");
   $("celebrate").style.display = complete(d) ? "block" : "none";
   const st = STORIES[todayStoryIdx()];
-  $("hs-em").textContent = st.e; $("hs-t").textContent = st.t;
+  $("hs-em").textContent = emo(st); $("hs-t").textContent = st.t;
+  let hi = $("hs-ill"); if (!hi) { hi = document.createElement("div"); hi.id = "hs-ill"; hi.className = "ill hs-ill"; const card = $("hs-t").closest(".card"); card.insertBefore(hi, card.firstChild); }
+  hi.innerHTML = ilustracao(st, "h");
 }
 
 // ---------- calendário ----------
