@@ -159,9 +159,9 @@
   const css = `
   .ex-kids{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
   .ex-kids button{padding:12px;border-radius:18px;font-family:"Baloo 2";font-size:22px;font-weight:800;background:#ffffff12;border:2px solid transparent}
-  .ex-kids button.on.manu{background:var(--manu);color:#fff}.ex-kids button.on.elena{background:var(--elena);color:#0b3b36}
+  .ex-kids button.on.manu{background:var(--manu);color:#fff}.ex-kids button.on.elena{background:var(--elena);color:#3d2a00}
   .ex-bal{text-align:center;padding:18px;border-radius:24px;margin-bottom:14px}
-  .ex-bal.manu{background:linear-gradient(160deg,#ff6fae,#b84ad6)}.ex-bal.elena{background:linear-gradient(160deg,#4fc9bc,#3e7fd9)}
+  .ex-bal.manu{background:linear-gradient(160deg,#ff6fae,#b84ad6)}.ex-bal.elena{background:linear-gradient(160deg,#ffe066,#f5a20f);color:#3d2a00}
   .ex-bal .n{font-family:"Baloo 2";font-size:56px;font-weight:800;line-height:1}
   .ex-bal small{display:block;font-weight:700;opacity:.95}
   .ex-bar{height:14px;background:#0003;border-radius:99px;overflow:hidden;margin:10px 0 4px}.ex-bar i{display:block;height:100%;background:var(--gold);border-radius:99px}
@@ -210,7 +210,7 @@
     cel.innerHTML = `<div><div class="big">${icon}</div><h2>${esc(title)}</h2><p>${esc(text)}</p></div>`;
     cel.classList.add("on"); clearTimeout(celT); celT = setTimeout(() => cel.classList.remove("on"), 2600);
     for (let i = 0; i < 18; i++) { const c = document.createElement("div"); c.className = "ex-conf"; c.textContent = ["⭐", "✨", "💛", "🌟"][i % 4]; c.style.left = Math.random() * 100 + "vw"; c.style.animationDelay = Math.random() * .5 + "s"; document.body.appendChild(c); setTimeout(() => c.remove(), 2600); }
-    try { if (window.speechSynthesis) { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(title); u.lang = "pt-BR"; const v = pickVoice(); if (v) u.voice = v; speechSynthesis.speak(u); } } catch (e) {}
+    try { if (window.speechSynthesis && !speaking) { if (speechSynthesis.speaking) speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(title); u.lang = "pt-BR"; const v = pickVoice(); if (v) u.voice = v; speechSynthesis.speak(u); } } catch (e) {}
   }
 
   function render() {

@@ -110,10 +110,32 @@ function pickVoice() {
   const vs = voices();
   return vs.find(v => v.voiceURI === S.voice) || vs.find(v => /pt-BR/i.test(v.lang)) || vs[0] || null;
 }
+// ---------- áudio gravado (voz feminina), um arquivo por mês ----------
+let player = null, stopAt = 0;
+function playRecorded(i, fromPrayer) {
+  const A = window.AUDIO_INDEX && window.AUDIO_INDEX[i];
+  if (!A) return false;
+  const [m, st, du, pr] = A, from = fromPrayer ? st + pr : st, to = st + du;
+  if (!player) {
+    player = new Audio(); player.preload = "auto";
+    player.addEventListener("timeupdate", () => { if (stopAt && player.currentTime >= stopAt - 0.05) stopRecorded(); });
+    player.addEventListener("ended", stopRecorded);
+    player.addEventListener("error", () => { if (stopAt) { stopRecorded(); toast("Sem internet para tocar o áudio"); } });
+  }
+  stopAt = to;
+  player.src = `audio-m${String(m).padStart(2, "0")}.m4a#t=${from.toFixed(2)},${to.toFixed(2)}`;
+  const seek = () => { player.removeEventListener("loadedmetadata", seek); if (Math.abs(player.currentTime - from) > 1) player.currentTime = from; };
+  player.addEventListener("loadedmetadata", seek);
+  const p = player.play(); if (p && p.catch) p.catch(() => stopRecorded());
+  speaking = true; setPlaying(true, fromPrayer ? null : $("btn-ouvir"));
+  return true;
+}
+function stopRecorded() { stopAt = 0; if (player) player.pause(); speaking = false; setPlaying(false); }
+const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 function speakText(text, btn) {
   if (!window.speechSynthesis) { toast("Este celular não tem leitura em voz"); return; }
   stopSpeak();
-  const parts = text.match(/[^.!?…]+[.!?…"”]{0,3}\s{0,9}/g) || [text];
+  const parts = IS_IOS ? [text] : (text.match(/[^.!?…]+[.!?…"”]{0,3}\s{0,9}/g) || [text]);
   const v = pickVoice();
   parts.forEach((p, i) => {
     const u = new SpeechSynthesisUtterance(p.trim());
@@ -128,14 +150,15 @@ function setPlaying(on, btn) {
   b.classList.toggle("playing", on && btn === b);
   b.textContent = on && btn === b ? "⏹ Parar" : "🔊 Ouvir";
 }
-function stopSpeak() { if (window.speechSynthesis) speechSynthesis.cancel(); speaking = false; setPlaying(false); }
+function stopSpeak() { if (player) { stopAt = 0; player.pause(); } if (window.speechSynthesis && (speechSynthesis.speaking || speechSynthesis.pending)) speechSynthesis.cancel(); speaking = false; setPlaying(false); }
 function toggleSpeak() {
   if (speaking) return stopSpeak();
   const s = STORIES[curStory];
-  speakText(`${s.t}. ${s.txt.replace(/\n/g, " ")} O que aprendemos: ${s.lic} Vamos conversar: ${s.q}`, $("btn-ouvir"));
   markStep("ler");
+  if (playRecorded(curStory)) return;
+  speakText(`${s.t}. ${s.txt.replace(/\n/g, " ")} O que aprendemos: ${s.lic} Vamos conversar: ${s.q}`, $("btn-ouvir"));
 }
-function speakPrayer() { speakText(STORIES[curStory].ora, null); }
+function speakPrayer() { if (speaking) stopSpeak(); if (!playRecorded(curStory, true)) speakText(STORIES[curStory].ora, null); }
 function fillVoices() {
   const vs = voices(), sel = $("aj-voz");
   sel.innerHTML = vs.length ? vs.map(v => `<option value="${esc(v.voiceURI)}">${esc(v.name)} (${v.lang})</option>`).join("") : "<option value=''>Voz padrão</option>";

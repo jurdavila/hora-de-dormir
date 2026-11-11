@@ -17,7 +17,7 @@
 <style>
 :root{
   --bg:#1b1640; --bg2:#262058; --card:#2f2868; --ink:#fff8ec; --muted:#c9c2ef;
-  --manu:#ff6fae; --manu-soft:#ff6fae33; --elena:#5fd3c6; --elena-soft:#5fd3c633;
+  --manu:#ff6fae; --manu-soft:#ff6fae33; --elena:#ffcc33; --elena-soft:#ffcc3333;
   --gold:#ffd166; --ok:#7ee08a; --line:#ffffff1f;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -37,7 +37,7 @@ main{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:calc(16px
 .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px}
 .hero{text-align:center;padding:26px 18px;border-radius:28px;position:relative;overflow:hidden}
 .hero.manu{background:linear-gradient(160deg,#ff6fae,#b84ad6)}
-.hero.elena{background:linear-gradient(160deg,#4fc9bc,#3e7fd9)}
+.hero.elena{background:linear-gradient(160deg,#ffe066,#f5a20f);color:#3d2a00}
 .hero .lbl{font-weight:700;font-size:15px;opacity:.95}
 .hero .name{font-family:"Baloo 2";font-size:64px;font-weight:800;line-height:1;margin:8px 0 6px;text-shadow:0 4px 0 #0002}
 .hero .sub{font-size:15px;opacity:.95}
@@ -97,7 +97,7 @@ select option{color:#000}
 .sheet p{color:var(--muted);margin:0 0 14px}
 .pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .pick button{padding:18px;border-radius:16px;font-family:"Baloo 2";font-size:24px;font-weight:800}
-.pick .m{background:var(--manu);color:#fff}.pick .e{background:var(--elena);color:#0b3b36}
+.pick .m{background:var(--manu);color:#fff}.pick .e{background:var(--elena);color:#3d2a00}
 .toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--gold);color:#3a2a00;padding:10px 16px;border-radius:999px;font-weight:700;z-index:30;display:none}
 .celebrate{text-align:center;font-family:"Baloo 2";font-size:22px;color:var(--gold);margin-top:12px;display:none}
 .hint{font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
@@ -233,6 +233,7 @@ select option{color:#000}
 <div class="toast" id="toast"></div>
 
 <script src="stories.js"></script>
+<script src="audio-index.js"></script>
 <script src="app.js"></script>
 <script src="extra.js"></script>
 </body>
